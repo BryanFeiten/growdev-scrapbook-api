@@ -21,11 +21,33 @@ app.get('/users', (request: Request, response: Response) => {
 });
 
 app.post('/users', (request: Request, response: Response) => {
-    const {firstName, lastName,  email, password, age, phone} = request.body;
-    if(firstName && lastName && email && password && age && phone) {
+    const {firstName, lastName, gender, email, password, age, phone} = request.body;
+    if(firstName && lastName && gender && email && password && age && phone) {
         const newUser = new User(firstName, lastName,  email, password, age, phone);
         users.push(newUser);
         return response.json(newUser);
     }
 });
+
+app.post('/login', (request: Request, response: Response) => {
+    const { email, password, newEmail, newPassword, newPhone } = request.body;
+    const userIndexToChange = users.findIndex(user => user.email === email && jwt.verify(user.verifyPassword, SECRET, (err: any, decoded: any) => {
+        if(err) return response.sendStatus(401);
+        if(decoded) return decoded;
+    }) === password)
+    switch(true) {
+        case newEmail:
+
+        case newPassword:
+        
+        case newPhone:
+
+        break
+
+        default:
+            return response.json("Passou pelos testes")
+
+    }
+})
+
 app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
