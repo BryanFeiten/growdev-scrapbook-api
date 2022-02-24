@@ -31,7 +31,7 @@ app.post('/users', (request: Request, response: Response) => {
 
 app.post('/login', (request: Request, response: Response) => {
     const { email, password, newEmail, newPassword, newPhone } = request.body;
-    const userIndexToChange = users.findIndex(user => user.email === email && jwt.verify(user.verifyPassword, SECRET, (err: any, decoded: any) => {
+    const userIndexToChange = users.findIndex(user => user.email === email && jwt.verify(user.getPassword, SECRET, (err: any, decoded: any) => {
         if(err) return response.sendStatus(401);
         if(decoded) return decoded;
     }) === password)
