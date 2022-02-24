@@ -34,20 +34,23 @@ app.post('/login', (request: Request, response: Response) => {
     const userIndexToChange = users.findIndex(user => user.email === email && jwt.verify(user.getPassword, SECRET, (err: any, decoded: any) => {
         if(err) return response.sendStatus(401);
         if(decoded) return decoded;
-    }) === password)
-    switch(true) {
-        case newEmail:
+    }) === password);
+    if(userIndexToChange) {
+        switch(true) {
+            case newEmail:
 
-        case newPassword:
-        
-        case newPhone:
+            case newPassword:
+            
+            case newPhone:
 
-        break
+            break
 
-        default:
-            return response.json("Passou pelos testes")
+            default:
+                return response.json("Passou pelos testes")
 
+        }
     }
+    return response.json("Pulou os testes.")
 })
 
 app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
