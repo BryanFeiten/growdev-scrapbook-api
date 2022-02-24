@@ -35,7 +35,7 @@ app.post('/login', (request: Request, response: Response) => {
         if(err) return response.sendStatus(401);
         if(decoded) return decoded;
     }) === password);
-    if(userIndexToChange) {
+    if(userIndexToChange > -1) {
         switch(true) {
             case newEmail:
 
