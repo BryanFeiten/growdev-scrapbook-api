@@ -95,7 +95,7 @@ function verifyFieldsValues(request: Request, response: Response, next: NextFunc
 }
 
 app.get('/', (request: Request, response: Response) => {
-    return response.status(200).json(SECRET_KEY);
+    return response.status(200).json("API running...");
 });
 
 app.get('/users', verifyFieldsForLogin, async (request: Request, response: Response) => {
