@@ -7,7 +7,7 @@ import Post from './classes/Post';
 import dotenv from 'dotenv';
 dotenv.config();
 
-export const SECRET_KEY = process.env.SECRET_KEY || 'erro no dotenv';
+export const SECRET_KEY = process.env.SECRET_KEY || 'No key';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -95,7 +95,7 @@ function verifyFieldsValues(request: Request, response: Response, next: NextFunc
 }
 
 app.get('/', (request: Request, response: Response) => {
-    return response.status(200).json("API Running");
+    return response.status(200).json(SECRET_KEY);
 });
 
 app.get('/users', verifyFieldsForLogin, async (request: Request, response: Response) => {
