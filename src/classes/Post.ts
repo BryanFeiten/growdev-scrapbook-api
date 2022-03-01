@@ -11,5 +11,16 @@ const generateId = function idGenerator(userId: string):string {
 
 export default class Post {
     id: string = generateId(this.user.id);
+    
     constructor(public user: User, public postHeader: string, public postContent: string, public postPrivacity: Privacity) {}
+
+    setPostHeader(newPostHeader: string) {
+        this.postHeader = newPostHeader;
+    }
+    setPostContent(newPostContent: string) {
+        this.postContent = newPostContent;
+    }
+    setPrivacity(newPrivacity: Privacity) {
+        this.postPrivacity = newPrivacity;
+    }
 }
