@@ -13,6 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 export const users: User[] = [];
 export const posts: Post[] = [];
+const userTryInvalidToken: User[] = [];
 const validToken: string[] = [];
 const invalidToken: string[] = [];
 
@@ -22,9 +23,9 @@ app.use(cors());
 
 async function checkUserIndexExists(email: string, password: string) {
     try {
-        const userIndex = users.findIndex(user => user.email === email);        
+        const userIndex = users.findIndex(user => user.email === email);
         const verifyPassword = await bcrypt.compare(password, users[userIndex].getPassword);
-                
+
         if (userIndex !== -1 && verifyPassword) {
             return userIndex;
         } else {
@@ -94,12 +95,58 @@ function verifyFieldsValues(request: Request, response: Response, next: NextFunc
     }
 }
 
+function verifyToken(request: Request, response: Response, next: NextFunction) {
+    const { token } = request.headers;
+    
+    if(token) {
+        const userIndexFinded = users.findIndex(user => user.token === token);
+        if(userIndexFinded !== -1) {
+            const tokenIndexAlreadyValid = validToken.findIndex(token => token === users[userIndexFinded].token);
+            const tokenIndexAlreadyInvalid = invalidToken.findIndex(token => token === users[userIndexFinded].token);
+            if (tokenIndexAlreadyValid === -1 && tokenIndexAlreadyInvalid === -1) {
+                const token = jwt.sign(users[userIndexFinded].id, SECRET_KEY);
+                users[userIndexFinded].setToken(token);
+                validToken.push(token);
+                return response.json({
+                    mensagem: "Login efetuado com sucesso!",
+                    token
+                });
+            } else if (tokenIndexAlreadyValid !== -1 && tokenIndexAlreadyInvalid === -1) {
+                return response.json({
+                    mensagem: "Você já está logado."
+                })
+            } else {
+                userTryInvalidToken.push(users[userIndexFinded]);
+                users.splice(userIndexFinded, 1);
+                return response.json({
+                    mensagem: "O token de seu usuário é inválido. Você está sendo removido da rede por tentativa de burlar o sistema. Á partir de hoje, seu email consta em nossa lista de tentativas de fraude."
+                })
+            }
+        }
+    } else {
+
+    }
+}
+
 app.get('/', (request: Request, response: Response) => {
     return response.status(200).json("API running...");
 });
 
+app.get('/testUsers', (request: Request, response: Response) => {
+    return response.status(200).json({
+        users,
+        posts
+    })
+})
+
 app.get('/users', verifyFieldsForLogin, async (request: Request, response: Response) => {
     const { email, password } = request.body;
+    const { token } = request.headers;
+    const indexValidToken = await validToken.findIndex(tokenCompare => tokenCompare === token);
+    if (indexValidToken !== -1) {
+        console.log(token === validToken[0]);
+    }
+
     if (email && password) {
         const userIndexFinded = await checkUserIndexExists(email, password);
         const token = users[userIndexFinded].token;
@@ -139,13 +186,27 @@ app.post('/login', verifyFieldsForLogin, async (request: Request, response: Resp
     try {
         const userIndexFinded = await checkUserIndexExists(email, password);
         if (userIndexFinded !== -1) {
-            const token = await jwt.sign(users[userIndexFinded].id, SECRET_KEY);
-            users[userIndexFinded].setToken(token);
-            validToken.push(token);
-            return response.json({
-                mensagem: "logado!",
-                token
-            });
+            const tokenIndexAlreadyValid = validToken.findIndex(token => token === users[userIndexFinded].token);
+            const tokenIndexAlreadyInvalid = invalidToken.findIndex(token => token === users[userIndexFinded].token);
+            if (tokenIndexAlreadyValid === -1 && tokenIndexAlreadyInvalid === -1) {
+                const token = await jwt.sign(users[userIndexFinded].id, SECRET_KEY);
+                users[userIndexFinded].setToken(token);
+                validToken.push(token);
+                return response.json({
+                    mensagem: "Login efetuado com sucesso!",
+                    token
+                });
+            } else if (tokenIndexAlreadyValid !== -1 && tokenIndexAlreadyInvalid === -1) {
+                return response.json({
+                    mensagem: "Você já está logado."
+                })
+            } else {
+                userTryInvalidToken.push(users[userIndexFinded]);
+                users.splice(userIndexFinded, 1);
+                return response.json({
+                    mensagem: "O token de seu usuário é inválido. Você está sendo removido da rede por tentativa de burlar o sistema. Á partir de hoje, seu email consta em nossa lista de tentativas de fraude."
+                })
+            }
         } else {
             return response.sendStatus(401);
         }
@@ -154,7 +215,7 @@ app.post('/login', verifyFieldsForLogin, async (request: Request, response: Resp
     }
 })
 
-app.post('/logout', async (request: Request, response: Response) => {
+app.post('/logout', verifyToken, async (request: Request, response: Response) => {
     const { email, password } = request.body;
     try {
         if (email && password) {
@@ -206,7 +267,7 @@ app.get('/posts', async (request: Request, response: Response) => {
 app.post('/posts', async (request: Request, response: Response) => {
     const { email, password, postHeader, postContent, postPrivacity } = request.body;
     const userIndexFinded = await checkUserIndexExists(email, password);
-    
+
     if (userIndexFinded === -1) {
         return response.status(401).json({
             mensagem: "Crie um usuário."
