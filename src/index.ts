@@ -36,32 +36,6 @@ async function checkUserIndexExists(email: string, password: string) {
     }
 }
 
-async function verifyFieldsForLogin(request: Request, response: Response, next: NextFunction) {
-    const { email, password } = request.body;
-
-    try {
-        const userIndex = users.findIndex(user => user.email === email);
-
-        if (userIndex !== -1 && password) {
-            const verifyPassword = await bcrypt.compare(password, users[0].getPassword);
-
-            if (verifyPassword) {
-                next();
-            } else {
-                return response.json({
-                    mensagem: "Usuário ou senha incorretos."
-                })
-            }
-        } else {
-            return response.json({
-                mensagem: "Usuário ou senha incorretos."
-            })
-        }
-    } catch (error) {
-        return response.json("Erro");
-    }
-}
-
 function verifyFieldsValues(request: Request, response: Response, next: NextFunction) {
     const { firstName, lastName, gender, email, password, age, phone } = request.body;
     let mensagem = '';
@@ -95,36 +69,22 @@ function verifyFieldsValues(request: Request, response: Response, next: NextFunc
     }
 }
 
-function verifyToken(request: Request, response: Response, next: NextFunction) {
-    const { token } = request.headers;
-    
+function validateToken(request: Request, response: Response, next: NextFunction) {
+    const { token } = request.body;
     if(token) {
-        const userIndexFinded = users.findIndex(user => user.token === token);
-        if(userIndexFinded !== -1) {
-            const tokenIndexAlreadyValid = validToken.findIndex(token => token === users[userIndexFinded].token);
-            const tokenIndexAlreadyInvalid = invalidToken.findIndex(token => token === users[userIndexFinded].token);
-            if (tokenIndexAlreadyValid === -1 && tokenIndexAlreadyInvalid === -1) {
-                const token = jwt.sign(users[userIndexFinded].id, SECRET_KEY);
-                users[userIndexFinded].setToken(token);
-                validToken.push(token);
-                return response.json({
-                    mensagem: "Login efetuado com sucesso!",
-                    token
-                });
-            } else if (tokenIndexAlreadyValid !== -1 && tokenIndexAlreadyInvalid === -1) {
-                return response.json({
-                    mensagem: "Você já está logado."
-                })
-            } else {
-                userTryInvalidToken.push(users[userIndexFinded]);
-                users.splice(userIndexFinded, 1);
-                return response.json({
-                    mensagem: "O token de seu usuário é inválido. Você está sendo removido da rede por tentativa de burlar o sistema. Á partir de hoje, seu email consta em nossa lista de tentativas de fraude."
-                })
-            }
+        const tokenIndex = validToken.findIndex(tokenCompare => tokenCompare === token);
+
+        if (tokenIndex >= 0 && jwt.verify(token, SECRET_KEY)) {
+            next();
+        } else {
+            return response.status(401).json({
+                mensagem: "Seu token é inválido."
+            })
         }
     } else {
-
+        return response.status(401).json({
+            mensagem: "Por favor envie um token no body da requisição."
+        })
     }
 }
 
@@ -139,29 +99,19 @@ app.get('/testUsers', (request: Request, response: Response) => {
     })
 })
 
-app.get('/users', verifyFieldsForLogin, async (request: Request, response: Response) => {
-    const { email, password } = request.body;
-    const { token } = request.headers;
-    const indexValidToken = await validToken.findIndex(tokenCompare => tokenCompare === token);
-    if (indexValidToken !== -1) {
-        console.log(token === validToken[0]);
-    }
-
-    if (email && password) {
-        const userIndexFinded = await checkUserIndexExists(email, password);
-        const token = users[userIndexFinded].token;
-        if (token !== '') {
-            const showUsersLikethis: any[] = [];
-            users.map(user => showUsersLikethis.push({
-                Nome: `${user.firstName} ${user.lastName}`,
-                Idade: user.age
-            }))
-            return response.status(200).json(showUsersLikethis);
-        } else {
-            return response.status(401).json({
-                mensagem: "Faça o login."
-            })
-        }
+app.get('/users', validateToken, (request: Request, response: Response) => {
+    const { token } = request.body;
+    if (token) {
+        const showUsersLikethis: any[] = [];
+        users.map(user => showUsersLikethis.push({
+            Nome: `${user.firstName} ${user.lastName}`,
+            Idade: user.age
+        }))
+        return response.status(200).json(showUsersLikethis);
+    } else {
+        return response.status(401).json({
+            mensagem: "Faça o login."
+        })
     }
 });
 
@@ -181,7 +131,7 @@ app.post('/registration', verifyFieldsValues, async (request: Request, response:
     }
 });
 
-app.post('/login', verifyFieldsForLogin, async (request: Request, response: Response) => {
+app.post('/login', async (request: Request, response: Response) => {
     const { email, password } = request.body;
     try {
         const userIndexFinded = await checkUserIndexExists(email, password);
@@ -193,7 +143,7 @@ app.post('/login', verifyFieldsForLogin, async (request: Request, response: Resp
                 users[userIndexFinded].setToken(token);
                 validToken.push(token);
                 return response.json({
-                    mensagem: "Login efetuado com sucesso!",
+                    mensagem: "Login efetuado com sucesso! Use o token abaixo para solicitar os serviços da API.",
                     token
                 });
             } else if (tokenIndexAlreadyValid !== -1 && tokenIndexAlreadyInvalid === -1) {
@@ -215,184 +165,146 @@ app.post('/login', verifyFieldsForLogin, async (request: Request, response: Resp
     }
 })
 
-app.post('/logout', verifyToken, async (request: Request, response: Response) => {
-    const { email, password } = request.body;
-    try {
-        if (email && password) {
-            const userIndex = await checkUserIndexExists(email, password)
-            const token = users[userIndex].token;
-            const tokenIndex = validToken.findIndex(token => users[userIndex].token === token)
-            if (userIndex !== -1 && jwt.verify(token, SECRET_KEY) && tokenIndex !== -1) {
-                invalidToken.push(token);
-                validToken.splice(tokenIndex, 1);
-                users[userIndex].setToken('');
-                return response.json({
-                    mensagem: "Sucesso no Logout!"
-                });
-            } else {
-                return response.status(401).json({
-                    mensagem: "Não há como fazer logout se você não está logado."
-                })
-            }
-        } else {
-            return response.status(401).json({
-                mensagem: "Por favor insira um email e senha."
-            });
-        }
-    } catch (error) {
-        return response.sendStatus(404);
+app.post('/logout', validateToken, (request: Request, response: Response) => {
+    const { token } = request.body;
+    const tokenIndex = validToken.findIndex(tokenCompare => tokenCompare === token);
+    const userIndex = users.findIndex(user => user.token === token);
+
+    if(tokenIndex >= 0) {
+        invalidToken.push(token);
+        validToken.splice(tokenIndex, 1);
+        users[userIndex].setToken('');
+        return response.json({
+            mensagem: "Sucesso no Logout!"
+        });
+    } else {
+        return response.json("Seu token é inválido.")
     }
 })
 
-app.get('/posts', async (request: Request, response: Response) => {
-    const { email, password } = request.body;
-    const userIndexFinded = await checkUserIndexExists(email, password);
+app.get('/posts', validateToken, async (request: Request, response: Response) => {
+    const { token } = request.body;
+    const userIndexFinded = await users.findIndex(user => user.token === token);
     if (userIndexFinded === -1) {
         return response.json({
-            mensagem: "Crie um usuário."
+            mensagem: "Você precisa logar."
         });
     }
 
-    const tokenExist = users[userIndexFinded].token;
-    if (tokenExist === '') {
-        return response.json({
-            mensagem: "Você precisa logar."
-        })
-    }
     const showThisPosts = posts.filter(post => post.postPrivacity === 'public' || post.user.id === users[userIndexFinded].id);
 
     return response.json(showThisPosts);
 })
 
-app.post('/posts', async (request: Request, response: Response) => {
-    const { email, password, postHeader, postContent, postPrivacity } = request.body;
-    const userIndexFinded = await checkUserIndexExists(email, password);
+app.post('/posts', validateToken, (request: Request, response: Response) => {
+    const { token, postHeader, postContent, postPrivacity } = request.body;
+    const userIndexFinded = users.findIndex(user => user.token === token);
 
-    if (userIndexFinded === -1) {
-        return response.status(401).json({
-            mensagem: "Crie um usuário."
-        });
-    }
-
-    const tokenExist = users[userIndexFinded].token;
-    if (tokenExist === '') {
-        return response.json({
-            mensagem: "Você precisa logar."
-        })
-    }
-
-    if (postHeader && postContent && postPrivacity) {
-        if (postHeader.length >= 3 && postContent.length >= 4) {
-            if (postPrivacity === 'private' || postPrivacity === 'public') {
-                const newPost = new Post(users[userIndexFinded], postHeader, postContent, postPrivacity);
-                posts.push(newPost);
-
-                return response.json(posts);
+    if (token && userIndexFinded >= 0) {
+        if (postHeader && postContent && postPrivacity) {
+            if (postHeader.length >= 3 && postContent.length >= 4) {
+                if (postPrivacity === 'private' || postPrivacity === 'public') {
+                    const newPost = new Post(users[userIndexFinded], postHeader, postContent, postPrivacity);
+                    posts.push(newPost);
+    
+                    return response.json(posts);
+                } else {
+                    return response.json({
+                        mensagem: "Por favor, escolha a privacidade do seu post."
+                    })
+                }
             } else {
                 return response.json({
-                    mensagem: "Por favor, escolha a privacidade do seu post."
+                    mensagem: "Você precisa preencher os campos de cabeçalho e conteúdo.",
+                    requisitos: "Cabeçalho com 3 letras no mínimo, Conteúdo com 4 letras."
                 })
             }
         } else {
             return response.json({
-                mensagem: "Você precisa preencher os campos de cabeçalho e conteúdo.",
-                requisitos: "Cabeçalho com 3 letras no mínimo, Conteúdo com 4 letras."
+                mensagem: "Você precisa enviar os dados solicitados."
             })
         }
     } else {
         return response.json({
-            mensagem: "Você precisa enviar os dados solicitados."
-        })
-    }
-})
-
-app.put('/posts', async (request: Request, response: Response) => {
-    const { email, password, postId, newPostHeader, newPostContent, newPostPrivacity } = request.body;
-    const userIndexFinded = await checkUserIndexExists(email, password);
-
-    if (userIndexFinded === -1) {
-        return response.json({
-            mensagem: "Usuário não encontrado."
-        })
-    }
-
-    const tokenExist = users[userIndexFinded].token;
-    if (tokenExist === '') {
-        return response.json({
             mensagem: "Você precisa logar."
         })
-    }
+    }    
+})
 
-    const thisPostIndex = posts.findIndex(post => post.id === postId);
-    if (thisPostIndex === -1) {
-        return response.json({
-            mensgem: `Infelizmente não encontramos nenhum post com o id ${postId}.`
-        })
-    }
+app.put('/posts', validateToken, (request: Request, response: Response) => {
+    const { token, postId, newPostHeader, newPostContent, newPostPrivacity } = request.body;
 
-    if (posts[thisPostIndex].user.id !== users[userIndexFinded].id) {
-        return response.json({
-            mensagem: "Apenas o criador do post pode alterar o conteúdo do mesmo."
-        })
-    }
+    const userIndexFinded = users.findIndex(user => user.token === token);
 
-    if (newPostHeader && newPostContent && newPostPrivacity) {
-        if (newPostHeader.length >= 3 && newPostContent.length >= 4) {
-            if (newPostPrivacity === 'private' || newPostPrivacity === 'public') {
-                posts[thisPostIndex].setPostHeader(newPostHeader);
-                posts[thisPostIndex].setPostContent(newPostContent);
-                posts[thisPostIndex].setPrivacity(newPostPrivacity);
-                return response.json(posts[thisPostIndex]);
+    if (userIndexFinded >= 0) {
+        const thisPostIndex = posts.findIndex(post => post.id === postId);
+        if (thisPostIndex >= 0) {
+            if (posts[thisPostIndex].user.id === users[userIndexFinded].id) {
+                if (newPostHeader && newPostContent && newPostPrivacity) {
+                    if (newPostHeader.length >= 3 && newPostContent.length >= 4) {
+                        if (newPostPrivacity === 'private' || newPostPrivacity === 'public') {
+                            posts[thisPostIndex].setPostHeader(newPostHeader);
+                            posts[thisPostIndex].setPostContent(newPostContent);
+                            posts[thisPostIndex].setPrivacity(newPostPrivacity);
+                            return response.json(posts[thisPostIndex]);
+                        } else {
+                            return response.json({
+                                mensagem: "Por favor, escolha a privacidade do seu post."
+                            })
+                        }
+                    } else {
+                        return response.json({
+                            mensagem: "Você precisa preencher os campos de cabeçalho e conteúdo.",
+                            requisitos: "Cabeçalho com 3 letras no mínimo, Conteúdo com 4 letras."
+                        })
+                    }
+                } else {
+                    return response.json({
+                        mensagem: "Você precisa enviar os dados solicitados."
+                    })
+                }
             } else {
                 return response.json({
-                    mensagem: "Por favor, escolha a privacidade do seu post."
+                    mensagem: "Apenas o criador do post pode alterar o conteúdo do mesmo."
                 })
             }
         } else {
             return response.json({
-                mensagem: "Você precisa preencher os campos de cabeçalho e conteúdo.",
-                requisitos: "Cabeçalho com 3 letras no mínimo, Conteúdo com 4 letras."
+                mensagem: `Infelizmente não encontramos nenhum post com o id ${postId}.`
             })
         }
     } else {
         return response.json({
-            mensagem: "Você precisa enviar os dados solicitados."
+            mensagem: "Você precisa logar."
         })
     }
 })
 
-app.delete('/posts', async (request: Request, response: Response) => {
-    const { email, password, postId } = request.body;
-    const userIndexFinded = await checkUserIndexExists(email, password);
+app.delete('/posts', validateToken, (request: Request, response: Response) => {
+    const { token, postId } = request.body;
+    const userIndexFinded = users.findIndex(user => user.token === token);
 
-    if (userIndexFinded === -1) {
-        return response.json({
-            mensagem: "Usuário não encontrado."
-        })
-    }
-
-    const tokenExist = users[userIndexFinded].token;
-    if (tokenExist === '') {
+    if (userIndexFinded >= 0) {
+        const thisPostIndex = posts.findIndex(post => post.id === postId);
+        if (thisPostIndex >= 0) {
+            if (posts[thisPostIndex].user.id !== users[userIndexFinded].id) {
+                posts.splice(thisPostIndex, 1);
+            return response.sendStatus(204);
+            } else {
+                return response.json({
+                    mensagem: "Apenas o criador do post pode excluí-lo."
+                })
+            }
+        } else {
+            return response.json({
+                mensgem: `Infelizmente não encontramos nenhum post com o id ${postId}.`
+            })
+        }
+    } else {
         return response.json({
             mensagem: "Você precisa logar."
         })
-    }
-
-    const thisPostIndex = posts.findIndex(post => post.id === postId);
-    if (thisPostIndex === -1) {
-        return response.json({
-            mensgem: `Infelizmente não encontramos nenhum post com o id ${postId}.`
-        })
-    }
-
-    if (posts[thisPostIndex].user.id !== users[userIndexFinded].id) {
-        return response.json({
-            mensagem: "Apenas o criador do post pode excluí-lo."
-        })
-    }
-
-    posts.splice(thisPostIndex, 1);
-    return response.sendStatus(204);
+    }    
 })
 
 app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
