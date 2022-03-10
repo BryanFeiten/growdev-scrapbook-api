@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
-import User from './User';
 import { SECRET_KEY } from '../index';
 
-type Privacity = 'private' | 'public';
+export type Privacity = 'private' | 'public';
 
 const generateId = function idGenerator(userId: string):string {
     const id = jwt.sign({userId}, SECRET_KEY);
@@ -10,9 +9,9 @@ const generateId = function idGenerator(userId: string):string {
 }
 
 export default class Post {
-    id: string = generateId(this.user.id);
+    id: string = generateId(this.userId);
     
-    constructor(public user: User, public postHeader: string, public postContent: string, public postPrivacity: Privacity) {}
+    constructor(public userId: string, public postHeader: string, public postContent: string, public postPrivacity: Privacity) {}
 
     setPostHeader(newPostHeader: string) {
         this.postHeader = newPostHeader;
