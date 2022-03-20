@@ -4,10 +4,10 @@ import * as bcrypt from 'bcrypt';
 import { SECRET_KEY } from '../index';
 
 import { users } from '../index';
-import { validToken } from '../index';
+import { searchIndex } from '../controllers/rules';
 
 export function verifyFieldsValues(request: Request, response: Response, next: NextFunction) {
-    const { firstName, lastName, gender, email, password, age, phone } = request.body;
+    const { firstName, lastName, gender, email, age } = request.body;
     let mensagem = '';
     let error = false;
     switch (true) {
@@ -39,7 +39,13 @@ export function verifyFieldsValues(request: Request, response: Response, next: N
     }
 }
 
-export async function checkUserIndexExists(email: string, password: string) {
+export function checkUserIndexExists(email:string) {
+    const userIndex = users.findIndex(user => user.email === email);
+    
+    return userIndex;
+}
+
+export async function checkForLogin(email: string, password: string) {
     try {
         const userIndex = users.findIndex(user => user.email === email);
         const verifyPassword = await bcrypt.compare(password, users[userIndex].getPassword);
@@ -54,28 +60,45 @@ export async function checkUserIndexExists(email: string, password: string) {
     }
 }
 
-export function validateToken(request: Request, response: Response, next: NextFunction) {
-    const { token } = request.body;
+export async function verifyToken(request: Request, response: Response, next: NextFunction) {
+    const temptoken = request.cookies.tempToken;
+    const token = request.cookies.token;
 
-    if (token) {
-        const tokenIndex = validToken.findIndex(tokenCompare => tokenCompare === token);
-
-        if (tokenIndex >= 0 && jwt.verify(token, SECRET_KEY)) {
-            next();
-        } else {
-            return response.status(401).json({
-                mensagem: "Seu token é inválido."
-            })
-        }
-    } else {
-        return response.status(401).json({
-            mensagem: "Por favor envie um token no body da requisição."
+    if (!token) {
+        return response.json({
+            mensagem: "Faça seu login!"
         })
     }
+
+    const userIndex = searchIndex('token', token);
+
+    if (userIndex < 0) {
+        return response.status(401).json({
+            mensagem: "Token inválido."
+        })
+    }
+
+    jwt.verify(temptoken, SECRET_KEY, { complete: true }, error => {
+        if (error) {
+            jwt.verify(token, SECRET_KEY, { complete: true }, err => {
+                if (err) {
+                    return response.status(401).json({
+                        mensagem: "Seu acesso expirou. Faça o login novamente."
+                    })
+                } else {
+                    const refreshToken = users[userIndex].refreshToken();
+                    const tempToken = jwt.sign({ refreshToken }, SECRET_KEY, { expiresIn: "300000" });
+                    response.cookie('tempToken', tempToken, { maxAge: 300000, httpOnly: true });
+                }
+            })
+        }
+    });
+
+    next();
 }
 
 export function checkEnvironmentVariables(request: Request, response: Response, next: NextFunction) {
-    if(SECRET_KEY !== 'INVALID KEY') {
+    if (SECRET_KEY !== 'INVALID KEY') {
         next()
     } else {
         return response.status(401).json({

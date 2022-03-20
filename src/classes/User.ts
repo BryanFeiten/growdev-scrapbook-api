@@ -1,18 +1,21 @@
-import jwt from 'jsonwebtoken';
-import { SECRET_KEY } from '../index';
+const generateId = () => Math.random().toString(36).substring(2);
 
-const generateId = function idGenerator(randomGenerator: string):string {
-    const id = jwt.sign({randomGenerator}, SECRET_KEY);
-    return id;
+const generateToken = () => {
+    return Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
 }
 
+const generateRandomValue = () => Math.random().toString(36).substring(2);
+
 type Gender = 'masculine' | 'female' | 'non-binary';
-
 export default class User {
-    id: string = generateId(Math.random().toString(36).substring(2));
+    id: string = generateId();
     token: string = '';
+    tempToken: string = '';
+    lastLoggedIp: string = '';
 
-    constructor(public firstName: string, public lastName: string, public gender: Gender, public email: string, public phone: string, private password: string, public age: number) {}
+
+    constructor(public firstName: string, public lastName: string, public gender: Gender, public email: string, public phone: string, private password: string, public age: number) { }
+
 
     get getPassword() {
         return this.password;
@@ -20,9 +23,6 @@ export default class User {
 
     setPassword(newPassword: string) {
         this.password = newPassword;
-    }
-    setToken(token: string) {
-        this.token = token;
     }
     setFirstName(newFirstName: string) {
         this.firstName = newFirstName;
@@ -32,5 +32,22 @@ export default class User {
     }
     setGender(newGender: Gender) {
         this.gender = newGender;
+    }
+
+
+    setLogout() {
+        this.token = '';
+        this.tempToken = '';
+    }
+    setToken(ipAdress: string) {
+        this.token = generateToken();
+        this.lastLoggedIp = ipAdress;
+
+        return this.token;
+    }
+    refreshToken() {
+        this.tempToken = generateRandomValue();
+
+        return this.tempToken;
     }
 }

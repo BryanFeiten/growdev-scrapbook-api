@@ -1,5 +1,8 @@
+import jwt from "jsonwebtoken";
+
+import { SECRET_KEY } from "../index";
 import { Privacity } from "../classes/Post";
-type TypeOfContent = 'post' | 'user';
+type TypeOfContent = 'post' | 'user' | 'token' | 'userEmail';
 import { users, posts } from "../index";
 
 export function postValidation(postHeader: string, postContent: string, postPrivacity: Privacity) {
@@ -35,10 +38,18 @@ export function searchIndex(typeContent: TypeOfContent, key: string) {
             break
 
         case 'user':
-            objectIndex = users.findIndex(user => user.token === key)
+            objectIndex = users.findIndex(user => user.id === key);
+            break
+
+        case 'token':
+            objectIndex = users.findIndex(user => user.token === jwt.verify(key, SECRET_KEY).token);
+            break
+        
+        case 'userEmail':
+            objectIndex = users.findIndex(user => user.email === key);
             break
     }
 
-        return objectIndex;
+    return objectIndex;
 }
 

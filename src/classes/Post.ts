@@ -1,10 +1,9 @@
-import jwt from 'jsonwebtoken';
 import { SECRET_KEY } from '../index';
 
 export type Privacity = 'private' | 'public';
 
 const generateId = function idGenerator(userId: string):string {
-    const id = jwt.sign({userId}, SECRET_KEY);
+    const id = `${Math.random().toString(36).substring(8)}-${Math.random().toString(36).substring(8)}-${Math.random().toString(36).substring(8)}`;
     return id;
 }
 

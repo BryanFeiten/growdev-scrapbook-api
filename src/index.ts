@@ -5,9 +5,11 @@ import User from './classes/User';
 import Post from './classes/Post';
 
 const app = express();
+
 import router from './routers/routes';
 
 export const SECRET_KEY = process.env.SECRET_KEY || 'INVALID KEY';
+export const DAILY_TOKEN = process.env.DAILY_TOKEN || 'INVALID KEY';
 export const userTryInvalidToken: User[] = [];
 
 const PORT = process.env.PORT || 5000;

@@ -1,14 +1,10 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const index_1 = require("../index");
-const generateId = function idGenerator(randomGenerator) {
-    const id = jsonwebtoken_1.default.sign({ randomGenerator }, index_1.SECRET_KEY);
-    return id;
+const generateId = () => Math.random().toString(36).substring(2);
+const generateToken = () => {
+    return Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
 };
+const generateRandomValue = () => Math.random().toString(36).substring(2);
 class User {
     constructor(firstName, lastName, gender, email, phone, password, age) {
         this.firstName = firstName;
@@ -18,17 +14,16 @@ class User {
         this.phone = phone;
         this.password = password;
         this.age = age;
-        this.id = generateId(Math.random().toString(36).substring(2));
+        this.id = generateId();
         this.token = '';
+        this.tempToken = '';
+        this.lastLoggedIp = '';
     }
     get getPassword() {
         return this.password;
     }
     setPassword(newPassword) {
         this.password = newPassword;
-    }
-    setToken(token) {
-        this.token = token;
     }
     setFirstName(newFirstName) {
         this.firstName = newFirstName;
@@ -38,6 +33,19 @@ class User {
     }
     setGender(newGender) {
         this.gender = newGender;
+    }
+    setLogout() {
+        this.token = '';
+        this.tempToken = '';
+    }
+    setToken(ipAdress) {
+        this.token = generateToken();
+        this.lastLoggedIp = ipAdress;
+        return this.token;
+    }
+    refreshToken() {
+        this.tempToken = generateRandomValue();
+        return this.tempToken;
     }
 }
 exports.default = User;
