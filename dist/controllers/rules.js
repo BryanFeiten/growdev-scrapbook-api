@@ -36,7 +36,10 @@ function searchIndex(typeContent, key) {
             objectIndex = index_2.users.findIndex(user => user.id === key);
             break;
         case 'token':
-            objectIndex = index_2.users.findIndex(user => user.token === jsonwebtoken_1.default.verify(key, index_1.SECRET_KEY).token);
+            objectIndex = index_2.users.findIndex(user => {
+                const decoded = jsonwebtoken_1.default.verify(key, index_1.SECRET_KEY);
+                return user.token === decoded.token;
+            });
             break;
         case 'userEmail':
             objectIndex = index_2.users.findIndex(user => user.email === key);

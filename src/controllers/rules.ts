@@ -42,7 +42,10 @@ export function searchIndex(typeContent: TypeOfContent, key: string) {
             break
 
         case 'token':
-            objectIndex = users.findIndex(user => user.token === jwt.verify(key, SECRET_KEY).token);
+            objectIndex = users.findIndex(user => {
+                const decoded = jwt.verify(key, SECRET_KEY);
+                return user.token === (<any>decoded).token;
+            });
             break
         
         case 'userEmail':
