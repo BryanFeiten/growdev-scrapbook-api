@@ -87,13 +87,13 @@ async function verifyToken(request, response, next) {
     const temptoken = request.cookies.tempToken;
     const token = request.cookies.token;
     if (!token) {
-        return response.json({
+        return response.status(401).json({
             mensagem: "Faça seu login!"
         });
     }
     const userIndex = (0, rules_1.searchIndex)('token', token);
     if (userIndex < 0) {
-        return response.status(401).json({
+        return response.status(403).json({
             mensagem: "Token inválido."
         });
     }
@@ -101,7 +101,7 @@ async function verifyToken(request, response, next) {
         if (error) {
             jsonwebtoken_1.default.verify(token, index_1.SECRET_KEY, { complete: true }, err => {
                 if (err) {
-                    return response.status(401).json({
+                    return response.status(403).json({
                         mensagem: "Seu acesso expirou. Faça o login novamente."
                     });
                 }
