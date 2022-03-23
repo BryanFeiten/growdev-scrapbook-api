@@ -1,3 +1,5 @@
+import jwt from 'jsonwebtoken';
+import { SECRET_KEY } from '../index';
 const generateId = () => Math.random().toString(36).substring(2);
 
 const generateToken = () => {
@@ -5,12 +7,22 @@ const generateToken = () => {
 }
 
 const generateRandomValue = () => Math.random().toString(36).substring(2);
-
+type Token = {
+    autoToken: string,
+    signToken: string
+}
 type Gender = 'masculine' | 'female' | 'non-binary';
 export default class User {
     id: string = generateId();
-    token: string = '';
-    tempToken: string = '';
+    token: Token = {
+        autoToken: '',
+        signToken: ''
+    };
+    tempToken: Token = {
+        autoToken: '',
+        signToken: ''
+    };
+    tempTokenRefreshed: boolean = false;
     lastLoggedIp: string = '';
 
 
@@ -36,18 +48,23 @@ export default class User {
 
 
     setLogout() {
-        this.token = '';
-        this.tempToken = '';
+        this.token.signToken = '';
+        this.tempToken.signToken = '';
     }
-    setToken(ipAdress: string) {
-        this.token = generateToken();
+    setLogin(ipAdress: string) {
+        this.token.autoToken = generateToken();
+        this.token.signToken = jwt.sign({ token: this.token.autoToken }, SECRET_KEY, { expiresIn: "57600000" });
         this.lastLoggedIp = ipAdress;
+        
+        const token = this.token.signToken;
+        const tempToken = this.refreshToken();
 
-        return this.token;
+        return { token, tempToken };
     }
     refreshToken() {
-        this.tempToken = generateRandomValue();
-
-        return this.tempToken;
+        this.tempToken.autoToken = generateRandomValue();
+        this.tempToken.signToken = jwt.sign({ tempToken: this.tempToken.autoToken }, SECRET_KEY, { expiresIn: "300000" });
+        this.tempTokenRefreshed = true;
+        return this.tempToken.signToken;
     }
 }

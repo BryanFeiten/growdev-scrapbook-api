@@ -6,7 +6,7 @@ import Post from './classes/Post';
 
 const app = express();
 
-import router from './routers/routes';
+import router from './routers/Router';
 
 export const SECRET_KEY = process.env.SECRET_KEY || 'INVALID KEY';
 export const DAILY_TOKEN = process.env.DAILY_TOKEN || 'INVALID KEY';
