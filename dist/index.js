@@ -7,7 +7,7 @@ exports.invalidToken = exports.validToken = exports.posts = exports.users = expo
 const express_1 = __importDefault(require("express"));
 require("dotenv/config");
 const app = (0, express_1.default)();
-const routes_1 = __importDefault(require("./routers/routes"));
+const Router_1 = __importDefault(require("./routers/Router"));
 exports.SECRET_KEY = process.env.SECRET_KEY || 'INVALID KEY';
 exports.DAILY_TOKEN = process.env.DAILY_TOKEN || 'INVALID KEY';
 exports.userTryInvalidToken = [];
@@ -16,5 +16,5 @@ exports.users = [];
 exports.posts = [];
 exports.validToken = [];
 exports.invalidToken = [];
-app.use(routes_1.default);
+app.use(Router_1.default);
 app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
