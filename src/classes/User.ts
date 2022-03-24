@@ -63,7 +63,7 @@ export default class User {
     }
     refreshToken() {
         this.tempToken.autoToken = generateRandomValue();
-        this.tempToken.signToken = jwt.sign({ tempToken: this.tempToken.autoToken }, SECRET_KEY, { expiresIn: "300000" });
+        this.tempToken.signToken = jwt.sign({ tempToken: this.tempToken.autoToken }, SECRET_KEY, { expiresIn: "10000" });
         this.tempTokenRefreshed = true;
         return this.tempToken.signToken;
     }

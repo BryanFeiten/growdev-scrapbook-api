@@ -45,7 +45,9 @@ router.get('/users', verifyToken, (request: Request, response: Response) => {
         })
     }
     
-    return response.status(200).json(showUsersLikethis);
+    return response.status(200).json({
+        showUsersLikethis: showUsersLikethis
+    });
 });
 
 router.post('/user/registration', verifyFieldsValues, async (request: Request, response: Response) => {
@@ -73,7 +75,7 @@ router.post('/user/auth', async (request: Request, response: Response) => {
         if (userIndexFinded !== -1) {
             let mensagem = "Login efetuado com sucesso!"
 
-            if (users[userIndexFinded].token) {
+            if (users[userIndexFinded].token.signToken) {
                 mensagem = "Você foi desconectado de outra sessão, e seu login foi efetuado com sucesso!"
             }
             const { token, tempToken } = users[userIndexFinded].setLogin(request.ip);
@@ -127,7 +129,9 @@ router.get('/posts', verifyToken, async (request: Request, response: Response) =
         })
     }
 
-    return response.status(200).json(showThisPosts);
+    return response.status(200).json({
+        showThisPosts: showThisPosts
+    });
 })
 
 router.get('/post/:postId', verifyToken, async (request: Request, response: Response) => {
@@ -171,7 +175,9 @@ router.get('/post/:postId', verifyToken, async (request: Request, response: Resp
             })
         }
 
-        return response.status(200).json(posts[postIndex]);
+        return response.status(200).json({
+            post: posts[postIndex]
+        });
     } else {
 
         if (users[userIndex].tempTokenRefreshed) {
@@ -209,7 +215,9 @@ router.post('/post/create', verifyToken, (request: Request, response: Response) 
                 })
             }
 
-            return response.status(201).json(newPost);
+            return response.status(201).json({
+                newPost: newPost
+            });
         } else {
 
             if (users[userIndex].tempTokenRefreshed) {
@@ -258,7 +266,9 @@ router.put('/post/modify/:postId', verifyToken, (request: Request, response: Res
                         })
                     }
 
-                    return response.status(200).json(posts[thisPostIndex]);
+                    return response.status(200).json({
+                        post: posts[thisPostIndex]
+                    });
                 } else {
 
                     if (users[userIndex].tempTokenRefreshed) {
@@ -352,7 +362,7 @@ router.delete('/post/delete/:postId', verifyToken, (request: Request, response: 
                 users[userIndex].tempTokenRefreshed = false;
                 
                 return response.status(400).json({
-                    mensgem: `Infelizmente não encontramos nenhum post com o id ${postId}.`,
+                    mensagem: `Infelizmente não encontramos nenhum post com o id ${postId}.`,
                     tempToken
                 })
             }

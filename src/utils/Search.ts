@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { SECRET_KEY } from "../index";
 import { users, posts } from "../index";
@@ -20,14 +20,14 @@ export default function searchIndex(typeContent: TypeOfContent, key: string) {
         case 'token':
             objectIndex = users.findIndex(user => {
                 const decoded = jwt.verify(key, SECRET_KEY);
-                return user.token === (<any>decoded).token;
+                return user.token.autoToken === (<JwtPayload>decoded).token;
             });
             break
 
         case 'tempToken':
             objectIndex = users.findIndex(user => {
                 const decoded = jwt.verify(key, SECRET_KEY);
-                return user.tempToken === (<any>decoded).tempToken;
+                return user.tempToken.autoToken === (<JwtPayload>decoded).tempToken;
             });
             break
         

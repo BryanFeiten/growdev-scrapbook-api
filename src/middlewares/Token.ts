@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { SECRET_KEY } from "../index";
 import { users } from '../index';
@@ -15,7 +15,7 @@ export default async function verifyToken(request: Request, response: Response, 
     }
 
     const userIndex = searchIndex('token', token);
-
+    
     if (userIndex < 0) {
         return response.status(403).json({
             mensagem: "Token inválido."
@@ -30,8 +30,31 @@ export default async function verifyToken(request: Request, response: Response, 
                         mensagem: "Seu acesso expirou. Faça o login novamente."
                     })
                 } else {
-                    const refreshToken = users[userIndex].refreshToken();
-                    request.body.tempToken = refreshToken;
+                    try {
+                        const decoded = jwt.verify(tempToken, SECRET_KEY);
+
+                        if (users[userIndex].tempToken.autoToken === (<JwtPayload>decoded).tempToken) {
+                            const refreshToken = users[userIndex].refreshToken();
+                            request.body.tempToken = refreshToken;
+                        } else {
+                            console.log("TRY")
+                            return response.status(403).json({
+                                mensagem: "Seu token está inválido. Pois já foi atualizado"
+                            })
+                        }
+                        
+                    } catch (error) {
+                        const decoded = jwt.decode(tempToken);
+                        if (users[userIndex].tempToken.autoToken === (<JwtPayload>decoded).tempToken) {
+                            const refreshToken = users[userIndex].refreshToken();
+                            request.body.tempToken = refreshToken;
+                        } else {
+                            console.log("CATCH")
+                            return response.status(403).json({
+                                mensagem: "Seu token está inválido. Pois já foi atualizado"
+                            })
+                        }
+                    }
                 }
             })
         }
