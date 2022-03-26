@@ -29,8 +29,32 @@ async function verifyToken(request, response, next) {
                     });
                 }
                 else {
-                    const refreshToken = index_2.users[userIndex].refreshToken();
-                    request.body.tempToken = refreshToken;
+                    try {
+                        const decoded = jsonwebtoken_1.default.verify(tempToken, index_1.SECRET_KEY);
+                        if (index_2.users[userIndex].tempToken.autoToken === decoded.tempToken) {
+                            const refreshToken = index_2.users[userIndex].refreshToken();
+                            request.body.tempToken = refreshToken;
+                        }
+                        else {
+                            console.log("TRY");
+                            return response.status(403).json({
+                                mensagem: "Seu token está inválido. Pois já foi atualizado"
+                            });
+                        }
+                    }
+                    catch (error) {
+                        const decoded = jsonwebtoken_1.default.decode(tempToken);
+                        if (index_2.users[userIndex].tempToken.autoToken === decoded.tempToken) {
+                            const refreshToken = index_2.users[userIndex].refreshToken();
+                            request.body.tempToken = refreshToken;
+                        }
+                        else {
+                            console.log("CATCH");
+                            return response.status(403).json({
+                                mensagem: "Seu token está inválido. Pois já foi atualizado"
+                            });
+                        }
+                    }
                 }
             });
         }

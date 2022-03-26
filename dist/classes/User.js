@@ -60,7 +60,7 @@ class User {
     }
     refreshToken() {
         this.tempToken.autoToken = generateRandomValue();
-        this.tempToken.signToken = jsonwebtoken_1.default.sign({ tempToken: this.tempToken.autoToken }, index_1.SECRET_KEY, { expiresIn: "300000" });
+        this.tempToken.signToken = jsonwebtoken_1.default.sign({ tempToken: this.tempToken.autoToken }, index_1.SECRET_KEY, { expiresIn: "10000" });
         this.tempTokenRefreshed = true;
         return this.tempToken.signToken;
     }

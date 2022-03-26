@@ -18,13 +18,13 @@ function searchIndex(typeContent, key) {
         case 'token':
             objectIndex = index_2.users.findIndex(user => {
                 const decoded = jsonwebtoken_1.default.verify(key, index_1.SECRET_KEY);
-                return user.token === decoded.token;
+                return user.token.autoToken === decoded.token;
             });
             break;
         case 'tempToken':
             objectIndex = index_2.users.findIndex(user => {
                 const decoded = jsonwebtoken_1.default.verify(key, index_1.SECRET_KEY);
-                return user.tempToken === decoded.tempToken;
+                return user.tempToken.autoToken === decoded.tempToken;
             });
             break;
         case 'userEmail':

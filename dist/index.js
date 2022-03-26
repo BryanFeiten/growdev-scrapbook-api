@@ -3,13 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.invalidToken = exports.validToken = exports.posts = exports.users = exports.userTryInvalidToken = exports.DAILY_TOKEN = exports.SECRET_KEY = void 0;
+exports.invalidToken = exports.validToken = exports.posts = exports.users = exports.userTryInvalidToken = exports.apiKey = exports.SECRET_KEY = void 0;
 const express_1 = __importDefault(require("express"));
 require("dotenv/config");
 const app = (0, express_1.default)();
 const Router_1 = __importDefault(require("./routers/Router"));
 exports.SECRET_KEY = process.env.SECRET_KEY || 'INVALID KEY';
-exports.DAILY_TOKEN = process.env.DAILY_TOKEN || 'INVALID KEY';
+exports.apiKey = process.env.PROTECT_ROUTE_KEY || 'INVALID KEY';
 exports.userTryInvalidToken = [];
 const PORT = process.env.PORT || 5000;
 exports.users = [];

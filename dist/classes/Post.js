@@ -5,8 +5,10 @@ const generateId = function idGenerator(userId) {
     return id;
 };
 class Post {
-    constructor(userId, postHeader, postContent, postPrivacity) {
+    constructor(userId, userFirstName, userLastName, postHeader, postContent, postPrivacity) {
         this.userId = userId;
+        this.userFirstName = userFirstName;
+        this.userLastName = userLastName;
         this.postHeader = postHeader;
         this.postContent = postContent;
         this.postPrivacity = postPrivacity;
