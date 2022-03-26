@@ -9,7 +9,7 @@ const app = express();
 import router from './routers/Router';
 
 export const SECRET_KEY = process.env.SECRET_KEY || 'INVALID KEY';
-export const DAILY_TOKEN = process.env.DAILY_TOKEN || 'INVALID KEY';
+export const apiKey = process.env.PROTECT_ROUTE_KEY || 'INVALID KEY';
 export const userTryInvalidToken: User[] = [];
 
 const PORT = process.env.PORT || 5000;

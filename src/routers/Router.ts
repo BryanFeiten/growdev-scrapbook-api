@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import User from '../classes/User';
 import Post from '../classes/Post';
 import { users, posts } from '../index';
+import protectRoute from '../middlewares/ProtectRoute';
 import checkEnvironmentVariables from '../middlewares/Environment';
 import verifyToken from '../middlewares/Token';
 import verifyFieldsValues from '../middlewares/Registration';
@@ -25,6 +26,46 @@ router.use(checkEnvironmentVariables);
 
 router.get('/', (request: Request, response: Response) => {
     return response.status(200).json("API running...");
+});
+
+router.post('/token', verifyToken, (request: Request, response: Response) => {
+    const { tempToken } = request.body;
+    const userIndex = searchIndex('tempToken', tempToken);
+
+    if (userIndex >= 0) {
+        return response.status(200).json({
+            mensagem: "Token Ok",
+            tempToken
+        })
+    }
+    return response.status(200).json({
+        mensagem: "Token Ok"
+    });
+});
+
+router.get('/protect/:key', protectRoute,(request: Request, response: Response) => {
+    return response.json({
+        users,
+        posts
+    })
+})
+
+router.post('/myId', verifyToken, (request: Request, response: Response) => {
+    const { tempToken } = request.body;
+    const userIndex = searchIndex('tempToken', tempToken);
+
+    if (users[userIndex].tempTokenRefreshed) {
+        users[userIndex].tempTokenRefreshed = false;
+        
+        return response.status(200).json({
+            id: users[userIndex].id,
+            tempToken
+        })
+    }
+    
+    return response.status(200).json({
+        id: users[userIndex].id
+    });
 });
 
 router.get('/users', verifyToken, (request: Request, response: Response) => {
@@ -61,7 +102,7 @@ router.post('/user/registration', verifyFieldsValues, async (request: Request, r
             return response.status(201).json(newUser);
         }
     } else {
-        return response.status(409).json({
+        return response.status(400).json({
             mensagem: "O e-mail já está cadastrado na plataforma."
         })
     }
@@ -108,7 +149,7 @@ router.post('/user/logout', verifyToken, (request: Request, response: Response) 
     }
 })
 
-router.get('/posts', verifyToken, async (request: Request, response: Response) => {
+router.post('/posts', verifyToken, async (request: Request, response: Response) => {
     const { tempToken } = request.body;
     const userIndex = searchIndex('tempToken', tempToken);
 
@@ -134,7 +175,7 @@ router.get('/posts', verifyToken, async (request: Request, response: Response) =
     });
 })
 
-router.get('/post/:postId', verifyToken, async (request: Request, response: Response) => {
+router.post('/post/search/:postId', verifyToken, async (request: Request, response: Response) => {
     const { tempToken } = request.body;
     const { postId } = request.params;
     const postIndex = posts.findIndex(post => post.id === postId);
@@ -201,9 +242,14 @@ router.post('/post/create', verifyToken, (request: Request, response: Response) 
 
     const { validPost, message } = postValidation(postHeader, postContent, postPrivacity);
 
+    console.log(validPost, message);
+    console.log(postHeader);
+    console.log(postContent);
+    console.log(postPrivacity);
+
     if (tempToken && userIndex >= 0) {
         if (validPost === true) {
-            const newPost = new Post(users[userIndex].id, postHeader, postContent, postPrivacity);
+            const newPost = new Post(users[userIndex].id, `${users[userIndex].firstName}`, `${users[userIndex].lastName}`, postHeader, postContent, postPrivacity);
             posts.push(newPost);
 
             if (users[userIndex].tempTokenRefreshed) {

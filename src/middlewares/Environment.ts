@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { SECRET_KEY } from "../index"
+import { SECRET_KEY, apiKey } from "../index"
 
 export default function checkEnvironmentVariables(request: Request, response: Response, next: NextFunction) {
-    if (SECRET_KEY !== 'INVALID KEY') {
+    if (apiKey !== 'INVALID KEY' && SECRET_KEY !== 'INVALID KEY') {
         next()
     } else {
         return response.status(401).json({

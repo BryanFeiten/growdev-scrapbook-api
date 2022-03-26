@@ -14,8 +14,8 @@ export default async function verifyToken(request: Request, response: Response, 
         })
     }
 
-    const userIndex = searchIndex('token', token);
-    
+    const userIndex = searchIndex('token', token);    
+
     if (userIndex < 0) {
         return response.status(403).json({
             mensagem: "Token inválido."
