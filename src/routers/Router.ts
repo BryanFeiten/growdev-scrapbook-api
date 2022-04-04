@@ -21,7 +21,7 @@ const router = express.Router();
 router.use(express.json());
 router.use(express.urlencoded({ extended: false }));
 router.use(cookieParser());
-router.use(cors({credentials: true}));
+router.use(cors());
 router.use(checkEnvironmentVariables);
 
 router.get('/', (request: Request, response: Response) => {

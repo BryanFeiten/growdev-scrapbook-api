@@ -41,7 +41,7 @@ const router = express_1.default.Router();
 router.use(express_1.default.json());
 router.use(express_1.default.urlencoded({ extended: false }));
 router.use((0, cookie_parser_1.default)());
-router.use((0, cors_1.default)({ credentials: true }));
+router.use((0, cors_1.default)());
 router.use(Environment_1.default);
 router.get('/', (request, response) => {
     return response.status(200).json("API running...");
