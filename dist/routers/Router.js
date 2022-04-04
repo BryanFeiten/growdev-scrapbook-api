@@ -26,7 +26,6 @@ const express_1 = __importDefault(require("express"));
 const bcrypt = __importStar(require("bcrypt"));
 require("dotenv/config");
 const cors_1 = __importDefault(require("cors"));
-const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const User_1 = __importDefault(require("../classes/User"));
 const Post_1 = __importDefault(require("../classes/Post"));
 const index_1 = require("../index");
@@ -40,7 +39,6 @@ const Post_2 = __importDefault(require("../utils/Post"));
 const router = express_1.default.Router();
 router.use(express_1.default.json());
 router.use(express_1.default.urlencoded({ extended: false }));
-router.use((0, cookie_parser_1.default)());
 router.use((0, cors_1.default)());
 router.use(Environment_1.default);
 router.get('/', (request, response) => {
