@@ -99,6 +99,9 @@ router.post('/user/registration', verifyFieldsValues, async (request: Request, r
 
             return response.status(201).json(newUser);
         }
+        return response.status(400).json({
+            mensagem: 'Você deve enviar todos os campos solicitados'
+        })
     } else {
         return response.status(400).json({
             mensagem: "O e-mail já está cadastrado na plataforma."
