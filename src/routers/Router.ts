@@ -2,7 +2,6 @@ import express, { Request, Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import 'dotenv/config';
 import cors from 'cors';
-import cookieParser from 'cookie-parser';
 
 import User from '../classes/User';
 import Post from '../classes/Post';
@@ -20,7 +19,6 @@ const router = express.Router();
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: false }));
-router.use(cookieParser());
 router.use(cors());
 router.use(checkEnvironmentVariables);
 
