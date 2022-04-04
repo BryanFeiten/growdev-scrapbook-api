@@ -97,7 +97,10 @@ router.post('/user/registration', verifyFieldsValues, async (request: Request, r
             const newUser = new User(firstName, lastName, gender, email, phone, await bcrypt.hash(password, 10), age);
             users.push(newUser);
 
-            return response.status(201).json(newUser);
+            return response.status(201).json({
+                newUser,
+                mensagem: "Usuário criado com sucesso. Você será redirecionado para a tela de login! (:"
+            });
         }
         return response.status(400).json({
             mensagem: 'Você deve enviar todos os campos solicitados'
