@@ -8,10 +8,10 @@ export default async function checkLogin(email: string, password: string) {
 
         if (userIndex !== -1 && verifyPassword) {
             return userIndex;
-        } else {
-            return -1;
         }
+
+        return -1;
     } catch (error) {
-        return -1
+        return -1;
     }
 }

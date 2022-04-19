@@ -23,14 +23,7 @@ export default function searchIndex(typeContent: TypeOfContent, key: string) {
                 return user.token.autoToken === (<JwtPayload>decoded).token;
             });
             break
-
-        case 'tempToken':
-            objectIndex = users.findIndex(user => {
-                const decoded = jwt.verify(key, SECRET_KEY);
-                return user.tempToken.autoToken === (<JwtPayload>decoded).tempToken;
-            });
-            break
-        
+                    
         case 'userEmail':
             objectIndex = users.findIndex(user => user.email === key);
             break
