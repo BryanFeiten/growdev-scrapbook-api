@@ -21,7 +21,11 @@ export default async function verifyToken(request: Request, response: Response, 
             mensagem: "Token inválido."
         })
     }
-
+    return response.json({
+        teste: `${users[userIndex].lastLoggedIp !== ip}`,
+        "Último IP Logado": users[userIndex].lastLoggedIp,
+        "IP atual": ip 
+    })
     if (users[userIndex].lastLoggedIp !== '' && ip !== users[userIndex].lastLoggedIp) {
         return response.status(405).json({
             mensagem: "Você estava logado em outro ip. Faça o login novamente."
