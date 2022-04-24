@@ -40,15 +40,6 @@ router.get('/protect/:key', protectRoute,(request: Request, response: Response) 
     })
 })
 
-router.post('/myId', verifyToken, (request: Request, response: Response) => {
-    const { token } = request.body;
-    const userIndex = searchIndex('token', token);
-    
-    return response.status(200).json({
-        id: users[userIndex].id
-    });
-});
-
 router.get('/users', verifyToken, (request: Request, response: Response) => {
     const { token } = request.body;
     const userIndex = searchIndex('token', token);
@@ -142,6 +133,7 @@ router.post('/posts', verifyToken, async (request: Request, response: Response) 
     const showThisPosts = posts.filter(post => post.postPrivacity === 'public' || post.userId === users[userIndex].id);
 
     return response.status(200).json({
+        id: users[userIndex].id,
         showThisPosts: showThisPosts
     });
 })
