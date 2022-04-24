@@ -97,7 +97,7 @@ router.post('/user/auth', async (request: Request, response: Response) => {
             if (users[userIndexFinded].token.signToken) {
                 mensagem = "Você foi desconectado de outra sessão, e seu login foi efetuado com sucesso!"
             }
-            const token = users[userIndexFinded].setLogin(request.ip.toString());
+            const token = users[userIndexFinded].setLogin();
             return response.status(200).json({
                 mensagem,
                 token

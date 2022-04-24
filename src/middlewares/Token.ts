@@ -21,17 +21,6 @@ export default async function verifyToken(request: Request, response: Response, 
             mensagem: "Token inválido."
         })
     }
-    return response.json({
-        teste: `${users[userIndex].lastLoggedIp !== ip}`,
-        "Último IP Logado": users[userIndex].lastLoggedIp,
-        "IP atual": ip,
-        "teste outra info": request.ips
-    })
-    if (users[userIndex].lastLoggedIp !== '' && ip !== users[userIndex].lastLoggedIp) {
-        return response.status(405).json({
-            mensagem: "Você estava logado em outro ip. Faça o login novamente."
-        })
-    }
     
     jwt.verify(token, SECRET_KEY, { complete: true }, err => {
         if (err) {

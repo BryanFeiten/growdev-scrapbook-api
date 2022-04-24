@@ -19,7 +19,6 @@ export default class User {
         autoToken: '',
         signToken: ''
     };
-    lastLoggedIp: string = '';
 
 
     constructor(public firstName: string, public lastName: string, public gender: Gender, public email: string, public phone: string, private password: string, public age: number) {}
@@ -46,10 +45,9 @@ export default class User {
         this.token.signToken = '';
     }
 
-    setLogin(ipAdress: string) {
+    setLogin() {
         this.token.autoToken = generateToken();
         this.token.signToken = jwt.sign({ token: this.token.autoToken }, SECRET_KEY, { expiresIn: "57600000" });
-        this.lastLoggedIp = ipAdress;
         
         const token = this.token.signToken;
 
