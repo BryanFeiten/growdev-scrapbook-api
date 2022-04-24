@@ -23,14 +23,14 @@ export default async function verifyToken(request: Request, response: Response, 
     }
 
     if (users[userIndex].lastLoggedIp !== '' && ip !== users[userIndex].lastLoggedIp) {
-        return response.status(403).json({
+        return response.status(405).json({
             mensagem: "Você estava logado em outro ip. Faça o login novamente."
         })
     }
     
     jwt.verify(token, SECRET_KEY, { complete: true }, err => {
         if (err) {
-            return response.status(403).json({
+            return response.status(406).json({
                 mensagem: "Seu acesso expirou. Faça o login novamente."
             })
         }
