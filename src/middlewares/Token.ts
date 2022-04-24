@@ -21,12 +21,13 @@ export default async function verifyToken(request: Request, response: Response, 
             mensagem: "Token inválido."
         })
     }
-
-    if (users[userIndex].lastLoggedIp !== '' && ip !== users[userIndex].lastLoggedIp) {
-        return response.status(405).json({
-            mensagem: "Você estava logado em outro ip. Faça o login novamente."
-        })
-    }
+    console.log(users[userIndex].lastLoggedIp);
+    
+    // if (users[userIndex].lastLoggedIp !== '' && ip !== users[userIndex].lastLoggedIp) {
+    //     return response.status(405).json({
+    //         mensagem: "Você estava logado em outro ip. Faça o login novamente."
+    //     })
+    // }
     
     jwt.verify(token, SECRET_KEY, { complete: true }, err => {
         if (err) {
