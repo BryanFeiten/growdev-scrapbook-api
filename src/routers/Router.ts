@@ -110,7 +110,9 @@ router.post('/user/auth', async (request: Request, response: Response) => {
         });
 
     } catch (error) {
-        return response.status(400).json(error);
+        return response.status(401).json({
+            mensagem: "Usuário ou senha inválidos."
+        });
     }
 })
 
