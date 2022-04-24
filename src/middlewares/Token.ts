@@ -24,7 +24,8 @@ export default async function verifyToken(request: Request, response: Response, 
     return response.json({
         teste: `${users[userIndex].lastLoggedIp !== ip}`,
         "Último IP Logado": users[userIndex].lastLoggedIp,
-        "IP atual": ip 
+        "IP atual": ip,
+        "teste outra info": request.ips
     })
     if (users[userIndex].lastLoggedIp !== '' && ip !== users[userIndex].lastLoggedIp) {
         return response.status(405).json({
