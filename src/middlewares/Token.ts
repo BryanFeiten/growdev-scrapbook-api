@@ -22,8 +22,6 @@ export default async function verifyToken(request: Request, response: Response, 
         })
     }
 
-    return response.json(users[userIndex].lastLoggedIp);
-    
     if (users[userIndex].lastLoggedIp !== '' && ip !== users[userIndex].lastLoggedIp) {
         return response.status(405).json({
             mensagem: "Você estava logado em outro ip. Faça o login novamente."
