@@ -21,8 +21,8 @@ export default async function verifyToken(request: Request, response: Response, 
             mensagem: "Token inválido."
         })
     }
-    
-    console.log(users[userIndex].lastLoggedIp);
+
+    return response.json(users[userIndex].lastLoggedIp);
     
     if (users[userIndex].lastLoggedIp !== '' && ip !== users[userIndex].lastLoggedIp) {
         return response.status(405).json({
