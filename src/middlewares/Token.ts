@@ -6,7 +6,7 @@ import searchIndex from '../utils/Search';
 
 export default async function verifyToken(request: Request, response: Response, next: NextFunction) {
     const { token } = request.body;
-    const ip = request.ip;
+    const ip = request.ip.toString();
     
     if (!token) {
         return response.status(401).json({
