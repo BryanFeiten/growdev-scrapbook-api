@@ -8,7 +8,14 @@ const generateId = function idGenerator(userId: string):string {
 export default class Post {
     id: string = generateId(this.userId);
     
-    constructor(public userId: string, public userFirstName: string, public userLastName: string,public postHeader: string, public postContent: string, public postPrivacity: Privacity) {}
+    constructor(
+            public userId: string,
+            public userFirstName: string,
+            public userLastName: string,
+            public postHeader: string,
+            public postContent: string,
+            public postPrivacity: Privacity
+        ) {}
 
     setPostHeader(newPostHeader: string) {
         this.postHeader = newPostHeader;

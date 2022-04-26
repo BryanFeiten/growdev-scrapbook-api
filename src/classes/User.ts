@@ -21,7 +21,15 @@ export default class User {
     };
 
 
-    constructor(public firstName: string, public lastName: string, public gender: Gender, public email: string, public phone: string, private password: string, public age: number) {}
+    constructor(
+            public firstName: string,
+            public lastName: string,
+            public gender: Gender,
+            public email: string,
+            public phone: string,
+            private password: string,
+            public age: number
+        ) {}
 
     get getPassword() {
         return this.password;
