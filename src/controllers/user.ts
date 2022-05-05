@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services';
 import { HttpError } from '../errors';
-import { defaultErrorMessage, forbidenMesageContent, HttpBadRequestCode, HttpForbidenCode, HttpNoContentCode, HttpNotFoundCode, HttpSuccessCode, HttpUnauthorizedCode, notFoundContentMessage, unauthorizedLoginMessage, unauthorizedMessage } from '../constants';
+import { defaultErrorMessage, forbidenMesageContent, HttpBadRequestCode, HttpForbidenCode, HttpNoContentCode, HttpNotFoundCode, HttpSuccessCode, HttpUnauthorizedCode, notFoundContentMessage, unauthorizedLoginMessage, unauthorizedMessage, userAlreadyMessage } from '../constants';
 import { UserEntity } from '../database/entities';
 
 export default class UserController {
@@ -35,6 +35,10 @@ export default class UserController {
         const userService = new UserService();
 
         try {
+            const userAlready = await userService.checkUserAlready(email);
+            
+            if (userAlready === userAlreadyMessage) throw new HttpError(userAlreadyMessage, HttpUnauthorizedCode);
+
             const user = await userService.create({
                 username,
                 fullName,
@@ -51,7 +55,7 @@ export default class UserController {
                 Gender: user.gender,
             });
         } catch (error) {
-            throw new HttpError(defaultErrorMessage, HttpBadRequestCode)
+            throw new HttpError(defaultErrorMessage, HttpBadRequestCode);
         }
     }
 
@@ -109,7 +113,7 @@ export default class UserController {
         const userService = new UserService();
 
         try {
-            const userToken = await userService.verifyIfUserExists({ email, password });
+            const userToken = await userService.checkLoginData({ email, password });
 
             if (userToken === unauthorizedLoginMessage) throw new HttpError(unauthorizedLoginMessage, HttpUnauthorizedCode);
 

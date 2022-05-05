@@ -36,9 +36,16 @@ export class UserService {
         await repository.delete(userID);
     }
 
-    async verifyIfUserExists(loginDTO: AuthLoginDTO) {
+    async checkUserAlready(email: string) {
         const repository = new UserRepository();
-        const userId = await repository.checkIfUserExists(loginDTO);
+        const userId = await repository.checkUserAlready(email);
+
+        return userId;
+    }
+
+    async checkLoginData(loginDTO: AuthLoginDTO) {
+        const repository = new UserRepository();
+        const userId = await repository.checkLoginData(loginDTO);
 
         return userId;
     }

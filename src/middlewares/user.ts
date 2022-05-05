@@ -24,11 +24,13 @@ export function loginFieldsValidator(request: Request, response: Response, next:
 export function createUserFieldValidator(request: Request, response: Response, next: NextFunction) {
     const { username, fullName, gender, email, password } = request.body;
 
+    if (!username || !fullName || !gender || !email || !password) throw new HttpError(invalidFieldMessage('Campo(s) de registro não enviado(s)'), HttpBadRequestCode);
+
     switch (true) {
         case username.length < 4:
             throw new HttpError(invalidFieldMessage('Username'), HttpBadRequestCode);
 
-        case fullName.length < 10:
+        case fullName.length === 0:
             throw new HttpError(invalidFieldMessage('Nome'), HttpBadRequestCode);
 
         case gender !== 'masculine' && gender !== 'femine' && gender !== 'non-binary':

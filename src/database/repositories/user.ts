@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 import { UserEntity } from '../entities';
 import { UserDTO, AuthLoginDTO } from '../../dto';
-import { notFoundContentMessage, unauthorizedLoginMessage } from '../../constants';
+import { notFoundContentMessage, successProccessMessage, unauthorizedLoginMessage, userAlreadyMessage } from '../../constants';
 
 export class UserRepository {
     async find() {
@@ -80,7 +80,21 @@ export class UserRepository {
         await UserEntity.delete(userId);
     }
 
-    async checkIfUserExists(loginDTO: AuthLoginDTO) {
+    async checkUserAlready(email: string) {
+        const user = await UserEntity.findOne({
+            where: {
+                email: email
+            }
+        });
+
+        if (user) {
+            return userAlreadyMessage;
+        }
+
+        return successProccessMessage;
+    }
+
+    async checkLoginData(loginDTO: AuthLoginDTO) {
 
         const user = await UserEntity.findOne({
             where: {
