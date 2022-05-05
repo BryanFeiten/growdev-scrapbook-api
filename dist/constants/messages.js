@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.successProccessMessage = exports.unauthorizedLoginMessage = exports.notFoundContentMessage = exports.forbidenMesageLogin = exports.forbidenMesageContent = exports.unauthorizedMessage = exports.invalidFieldMessage = exports.notImplementedMessage = exports.defaultErrorMessage = void 0;
+exports.defaultErrorMessage = 'Ocorreu um erro, tente novamente mais tarde';
+const notImplementedMessage = (componente) => `${componente} ainda não implementado`;
+exports.notImplementedMessage = notImplementedMessage;
+const invalidFieldMessage = (field) => `${field} inválido(s)`;
+exports.invalidFieldMessage = invalidFieldMessage;
+exports.unauthorizedMessage = 'Conteúdo não autorizado. Faça seu login';
+exports.forbidenMesageContent = 'Conteúdo não autorizado';
+exports.forbidenMesageLogin = 'Conteúdo não autorizado. Faça seu login';
+exports.notFoundContentMessage = 'Conteúdo não encontrado';
+exports.unauthorizedLoginMessage = 'Email ou senha incorretos';
+exports.successProccessMessage = 'Processamento concluído com sucesso';

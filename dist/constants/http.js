@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.HttpNotImplementedCode = exports.HttpInternalErrorCode = exports.HttpNotFoundCode = exports.HttpForbidenCode = exports.HttpUnauthorizedCode = exports.HttpBadRequestCode = exports.HttpNoContentCode = exports.HttpCreatedCode = exports.HttpSuccessCode = void 0;
+exports.HttpSuccessCode = 200;
+exports.HttpCreatedCode = 201;
+exports.HttpNoContentCode = 204;
+exports.HttpBadRequestCode = 400;
+exports.HttpUnauthorizedCode = 401;
+exports.HttpForbidenCode = 403;
+exports.HttpNotFoundCode = 404;
+exports.HttpInternalErrorCode = 500;
+exports.HttpNotImplementedCode = 501;

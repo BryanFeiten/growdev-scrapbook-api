@@ -9,27 +9,27 @@ import {
 import { UserEntity } from "./User";
 
 @Entity({ name: 'post' })
-export class PostEntity extends BaseEntity{
+export class PostEntity extends BaseEntity {
     @PrimaryColumn()
     id?: number;
 
-    @Column()
-    userId: string;
+    @Column({ name: 'user_id' })
+    userId: number;
 
-    @Column()
+    @Column({ name: 'post_header' })
     postHeader: string;
 
-    @Column()
+    @Column({ name: 'post_content' })
     postContent: string;
 
-    @Column()
+    @Column({ name: 'post_privacity' })
     postPrivacity: string;
 
     @ManyToOne(type => UserEntity, user => user.posts)
     @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
     user?: UserEntity;
 
-    constructor(userId: string, postHeader: string, postContent: string, postPrivacity: string) {
+    constructor(userId: number, postHeader: string, postContent: string, postPrivacity: string) {
         super();
         this.userId = userId;
         this.postHeader = postHeader;

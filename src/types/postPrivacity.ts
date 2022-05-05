@@ -1,0 +1,1 @@
+type postPrivacity = 'public' | 'private';

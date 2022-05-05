@@ -1,0 +1,1 @@
+type userGender = 'masculine' | 'feminine' | 'non-binary';

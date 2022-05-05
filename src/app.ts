@@ -3,10 +3,9 @@ import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 import Database from './database/connections/Database';
-import { ImplementsError, HttpError } from './errors';
+import { HttpError } from './errors';
 import './constants';
-import { HttpNotImplementedCode, notImplementedMessage } from './constants';
-// import  './constants';
+import { checkEnvironmentVariables, logMiddleware } from './middlewares/global';
 
 export default class Application {
     readonly #express: express.Application;
@@ -38,15 +37,12 @@ export default class Application {
     }
 
     private middlewares() {
-        throw new HttpError(
-            notImplementedMessage('Middleware'),
-            HttpNotImplementedCode
-        );
+        this.#express.use(logMiddleware ,checkEnvironmentVariables);
     }
 
     private errors() {
         this.#express.use((error: HttpError, request: Request, response: Response, next: NextFunction) => {
-            return response.status(error.status).json({
+            return response.status(error.status,).json({
                 mensagem: error.message
             });
         });
@@ -57,14 +53,14 @@ export default class Application {
 
         // TODO: refatorar para buscar apenas arquivos que implementar a interface HttpRouter
         fs.readdirSync(routersPath).forEach(filename => {
-            import(path.resolve(routersPath, filename)).then(file => {                
+            import(path.resolve(routersPath, filename)).then(file => {
                 const instance = new file.default();
-                this.#express.use(instance.init());      
+                this.#express.use(instance.init());
             });
         });
     }
 
-    private async database () {
+    private async database() {
         await Database.getInstance();
     }
 }

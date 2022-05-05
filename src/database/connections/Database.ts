@@ -10,6 +10,8 @@ export default class Database {
             const database = new Database();
             Database.instance = await database.openConnection();
         }
+
+        return Database.instance;
     }
 
     private async openConnection() {
