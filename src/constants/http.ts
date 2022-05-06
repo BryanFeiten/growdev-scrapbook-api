@@ -5,5 +5,3 @@ export const HttpBadRequestCode = 400;
 export const HttpUnauthorizedCode = 401;
 export const HttpForbidenCode = 403;
 export const HttpNotFoundCode = 404;
-export const HttpInternalErrorCode = 500;
-export const HttpNotImplementedCode = 501;

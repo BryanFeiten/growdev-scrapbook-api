@@ -4,7 +4,6 @@ import {
     PrimaryColumn,
     Column,
     OneToMany,
-    SaveOptions,
     BeforeInsert,
     BeforeUpdate,
     AfterLoad,

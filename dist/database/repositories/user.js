@@ -87,7 +87,18 @@ class UserRepository {
     async delete(userId) {
         await entities_1.UserEntity.delete(userId);
     }
-    async checkIfUserExists(loginDTO) {
+    async checkUserAlready(email) {
+        const user = await entities_1.UserEntity.findOne({
+            where: {
+                email: email
+            }
+        });
+        if (user) {
+            return constants_1.userAlreadyMessage;
+        }
+        return constants_1.successProccessMessage;
+    }
+    async checkLoginData(loginDTO) {
         const user = await entities_1.UserEntity.findOne({
             where: {
                 email: loginDTO.email

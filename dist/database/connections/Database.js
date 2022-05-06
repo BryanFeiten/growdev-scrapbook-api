@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 class Database {
-    constructor() { }
     static async getInstance() {
         if (!Database.instance) {
             const database = new Database();

@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkEnvironmentVariables = exports.logMiddleware = void 0;
-const errors_1 = require("../errors");
 const constants_1 = require("../constants");
 const logMiddleware = (request, response, next) => {
     const { ip, method } = request;
@@ -11,7 +10,9 @@ const logMiddleware = (request, response, next) => {
 exports.logMiddleware = logMiddleware;
 const checkEnvironmentVariables = (request, response, next) => {
     if (!process.env.PROTECT_ROUTE_KEY || !process.env.SECRET_KEY)
-        throw new errors_1.HttpError(constants_1.unauthorizedMessage, constants_1.HttpUnauthorizedCode);
+        return response.status(constants_1.HttpUnauthorizedCode).json({
+            mensagem: constants_1.unauthorizedMessage
+        });
     next();
 };
 exports.checkEnvironmentVariables = checkEnvironmentVariables;

@@ -1,6 +1,16 @@
 import { Request, Response } from 'express';
 import { HttpError } from '../errors';
-import { defaultErrorMessage, forbidenMesageContent, HttpBadRequestCode, HttpForbidenCode, HttpNoContentCode, HttpNotFoundCode, HttpSuccessCode, notFoundContentMessage, unauthorizedLoginMessage, unauthorizedMessage } from '../constants';
+import {
+    defaultErrorMessage,
+    forbidenContentMessage,
+    HttpBadRequestCode,
+    HttpCreatedCode,
+    HttpForbidenCode,
+    HttpNoContentCode,
+    HttpNotFoundCode,
+    HttpSuccessCode,
+    notFoundContentMessage,
+} from '../constants';
 import { PostService } from '../services';
 
 export default class PostController {
@@ -13,7 +23,7 @@ export default class PostController {
 
             return response.status(HttpSuccessCode).json(posts);
         } catch (error) {
-            throw new HttpError(defaultErrorMessage, HttpBadRequestCode)
+            throw new HttpError(defaultErrorMessage, HttpBadRequestCode);
         }
     }
 
@@ -25,12 +35,17 @@ export default class PostController {
         try {
             const post = await postservice.findOne(parseInt(id), Number(userId));
 
-            if (post === notFoundContentMessage) throw new HttpError(notFoundContentMessage, HttpNotFoundCode);
-            if (post === forbidenMesageContent) throw new HttpError(forbidenMesageContent, HttpForbidenCode);
+            if (post === notFoundContentMessage) return response.status(HttpNotFoundCode).json({
+                mensagem: notFoundContentMessage
+            })
+
+            if (post === forbidenContentMessage) return response.status(HttpForbidenCode).json({
+                mensagem: forbidenContentMessage
+            })
 
             return response.status(HttpSuccessCode).json(post);
         } catch (error) {
-            return response.json(error)
+            throw new HttpError(defaultErrorMessage, HttpBadRequestCode)
         }
     }
 
@@ -46,9 +61,9 @@ export default class PostController {
                 postPrivacity,
             });
 
-            return response.status(HttpSuccessCode).json(post);
-        } catch (error) {            
-            throw new HttpError(defaultErrorMessage, HttpBadRequestCode)
+            return response.status(HttpCreatedCode).json(post);
+        } catch (error) {
+            throw new HttpError(defaultErrorMessage, HttpBadRequestCode);
         }
     }
 
@@ -66,12 +81,17 @@ export default class PostController {
                 postPrivacity
             });
 
-            if (post === notFoundContentMessage) throw new HttpError(notFoundContentMessage, HttpNotFoundCode);
-            if (post === forbidenMesageContent) throw new HttpError(forbidenMesageContent, HttpForbidenCode);
+            if (post === notFoundContentMessage) return response.status(HttpNotFoundCode).json({
+                mensagem: notFoundContentMessage
+            })
+
+            if (post === forbidenContentMessage) return response.status(HttpForbidenCode).json({
+                mensagem: forbidenContentMessage
+            })
 
             return response.status(HttpSuccessCode).json(post);
         } catch (error) {
-            throw new HttpError(defaultErrorMessage, HttpBadRequestCode)
+            throw new HttpError(defaultErrorMessage, HttpBadRequestCode);
         }
     }
 
@@ -83,13 +103,16 @@ export default class PostController {
         try {
             const postDelete = await postService.delete(parseInt(id), Number(userId));
 
-            if (postDelete === notFoundContentMessage) throw new HttpError(notFoundContentMessage, HttpNotFoundCode);
-            if (postDelete === forbidenMesageContent) throw new HttpError(forbidenMesageContent, HttpForbidenCode);
+            if (postDelete === notFoundContentMessage) return response.status(HttpNotFoundCode).json({
+                mensagem: notFoundContentMessage
+            })
+
+            if (postDelete === forbidenContentMessage) return response.status(HttpForbidenCode).json({
+                mensagem: forbidenContentMessage
+            })
 
             return response.sendStatus(HttpNoContentCode);
         } catch (error) {
-            console.log(error);
-            
             throw new HttpError(defaultErrorMessage, HttpBadRequestCode);
         }
     }

@@ -31,8 +31,11 @@ class PostRepository {
     }
     async delete(postId) {
         const post = await entities_1.PostEntity.findOne(postId);
-        await entities_1.PostEntity.delete(postId);
-        return constants_1.successProccessMessage;
+        if (post) {
+            await entities_1.PostEntity.delete(postId);
+            return constants_1.successProccessMessage;
+        }
+        return constants_1.notFoundContentMessage;
     }
 }
 exports.PostRepository = PostRepository;

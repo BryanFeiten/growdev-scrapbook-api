@@ -18,7 +18,7 @@ class PostService {
         if (post === constants_1.notFoundContentMessage)
             return constants_1.notFoundContentMessage;
         if (post) {
-            return post.userId === userId || post.postPrivacity === 'public' ? post : constants_1.forbidenMesageContent;
+            return post.userId === userId || post.postPrivacity === 'public' ? post : constants_1.forbidenContentMessage;
         }
         return constants_1.notFoundContentMessage;
     }
@@ -33,7 +33,7 @@ class PostService {
         if (currentPost === constants_1.notFoundContentMessage)
             return constants_1.notFoundContentMessage;
         if (currentPost.userId !== postDTO.userId)
-            return constants_1.forbidenMesageContent;
+            return constants_1.forbidenContentMessage;
         const post = await repository.update(postDTO);
         if (!post)
             return constants_1.notFoundContentMessage;
@@ -45,7 +45,7 @@ class PostService {
         if (currentPost === constants_1.notFoundContentMessage)
             return constants_1.notFoundContentMessage;
         if (currentPost.userId !== userId)
-            return constants_1.forbidenMesageContent;
+            return constants_1.forbidenContentMessage;
         return await repository.delete(postId);
     }
 }

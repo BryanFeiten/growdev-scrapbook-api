@@ -24,7 +24,7 @@ export default class Application {
 
     start(port: number) {
         this.#express.listen(port, () => {
-            console.log(`Aplicação rodando na porta ${port}...`)
+            console.log(`Aplicação rodando na porta ${port}...`);
         });
     }
 
@@ -37,12 +37,12 @@ export default class Application {
     }
 
     private middlewares() {
-        this.#express.use(logMiddleware ,checkEnvironmentVariables);
+        this.#express.use(logMiddleware, checkEnvironmentVariables);
     }
 
     private errors() {
         this.#express.use((error: HttpError, request: Request, response: Response, next: NextFunction) => {
-            return response.status(error.status,).json({
+            return response.status(error.status).json({
                 mensagem: error.message
             });
         });

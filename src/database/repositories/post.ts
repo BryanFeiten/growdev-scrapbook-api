@@ -1,6 +1,6 @@
 import { PostEntity } from '../entities';
 import { PostDTO } from '../../dto';
-import { forbidenMesageContent, notFoundContentMessage, successProccessMessage } from '../../constants';
+import { notFoundContentMessage, successProccessMessage } from '../../constants';
 
 export class PostRepository {
     async find() {
@@ -18,7 +18,7 @@ export class PostRepository {
     }
 
     async create(postDTO: PostDTO) {
-        
+
         const post = new PostEntity(postDTO.userId, postDTO.postHeader, postDTO.postContent, postDTO.postPrivacity);
         await post.save();
 
@@ -31,7 +31,7 @@ export class PostRepository {
         if (post) {
             post.postHeader = postDTO.postHeader;
             post.postContent = postDTO.postContent;
-            post.postPrivacity = postDTO.postPrivacity;            
+            post.postPrivacity = postDTO.postPrivacity;
             await post.save();
         }
 
@@ -40,9 +40,13 @@ export class PostRepository {
 
     async delete(postId: number) {
         const post = await PostEntity.findOne(postId);
-        
-        await PostEntity.delete(postId);
 
-        return successProccessMessage;
+        
+        if (post) {
+            await PostEntity.delete(postId);
+            return successProccessMessage;
+        }
+        
+        return notFoundContentMessage;
     }
 }

@@ -1,9 +1,20 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services';
 import { HttpError } from '../errors';
-import { defaultErrorMessage, forbidenMesageContent, HttpBadRequestCode, HttpForbidenCode, HttpNoContentCode, HttpNotFoundCode, HttpSuccessCode, HttpUnauthorizedCode, notFoundContentMessage, unauthorizedLoginMessage, unauthorizedMessage, userAlreadyMessage } from '../constants';
-import { UserEntity } from '../database/entities';
-
+import {
+    defaultErrorMessage,
+    forbidenContentMessage,
+    HttpBadRequestCode,
+    HttpForbidenCode,
+    HttpNoContentCode,
+    HttpNotFoundCode,
+    HttpSuccessCode,
+    HttpUnauthorizedCode,
+    notFoundContentMessage,
+    unauthorizedLoginMessage,
+    unauthorizedMessage,
+    userAlreadyMessage
+} from '../constants';
 export default class UserController {
     async index(request: Request, response: Response) {
         const service = new UserService();
@@ -12,7 +23,7 @@ export default class UserController {
 
             return response.status(HttpSuccessCode).json(users);
         } catch (error) {
-            throw new HttpError(defaultErrorMessage, HttpBadRequestCode)
+            throw new HttpError(defaultErrorMessage, HttpBadRequestCode);
         }
     }
 
@@ -26,7 +37,7 @@ export default class UserController {
 
             return response.status(HttpSuccessCode).json(user);
         } catch (error) {
-            throw new HttpError(defaultErrorMessage, HttpBadRequestCode)
+            throw new HttpError(defaultErrorMessage, HttpBadRequestCode);
         }
     }
 
@@ -36,8 +47,10 @@ export default class UserController {
 
         try {
             const userAlready = await userService.checkUserAlready(email);
-            
-            if (userAlready === userAlreadyMessage) throw new HttpError(userAlreadyMessage, HttpUnauthorizedCode);
+
+            if (userAlready === userAlreadyMessage) return response.status(HttpUnauthorizedCode).json({
+                mensagem: userAlreadyMessage
+            })
 
             const user = await userService.create({
                 username,
@@ -63,20 +76,24 @@ export default class UserController {
         const { id } = request.params;
         const { userId, username, fullName, gender, birthDate } = request.body;
 
-        if (userId !== parseInt(id)) {
-            throw new HttpError(forbidenMesageContent, HttpForbidenCode);
-        }
+        if (userId !== parseInt(id)) return response.status(HttpForbidenCode).json({
+            mensagem: forbidenContentMessage
+        })
 
         const userService = new UserService();
 
         const currentInformations = await userService.findOne(parseInt(id), userId);
 
-        if (currentInformations === notFoundContentMessage) throw new HttpError(notFoundContentMessage, HttpNotFoundCode);
+        if (currentInformations === notFoundContentMessage) return response.status(HttpNotFoundCode).json({
+            mensagem: notFoundContentMessage
+        })
 
         const currentEmail = currentInformations.Email;
         const currentPass = currentInformations.Senha;
 
-        if (!currentEmail || !currentPass) throw new HttpError(defaultErrorMessage, HttpBadRequestCode);
+        if (!currentEmail || !currentPass) return response.status(HttpBadRequestCode).json({
+            mensagem: defaultErrorMessage
+        })
 
         try {
             const user = await userService.update({
@@ -91,7 +108,7 @@ export default class UserController {
 
             return response.status(HttpSuccessCode).json(user);
         } catch (error) {
-            throw new HttpError(defaultErrorMessage, HttpBadRequestCode)
+            throw new HttpError(defaultErrorMessage, HttpBadRequestCode);
         }
     }
 
@@ -115,7 +132,9 @@ export default class UserController {
         try {
             const userToken = await userService.checkLoginData({ email, password });
 
-            if (userToken === unauthorizedLoginMessage) throw new HttpError(unauthorizedLoginMessage, HttpUnauthorizedCode);
+            if (userToken === unauthorizedLoginMessage) return response.status(HttpUnauthorizedCode).json({
+                mensagem: unauthorizedMessage
+            })
 
             return response.status(HttpSuccessCode).json({
                 token: userToken

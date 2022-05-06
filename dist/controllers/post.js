@@ -22,13 +22,17 @@ class PostController {
         try {
             const post = await postservice.findOne(parseInt(id), Number(userId));
             if (post === constants_1.notFoundContentMessage)
-                throw new errors_1.HttpError(constants_1.notFoundContentMessage, constants_1.HttpNotFoundCode);
-            if (post === constants_1.forbidenMesageContent)
-                throw new errors_1.HttpError(constants_1.forbidenMesageContent, constants_1.HttpForbidenCode);
+                return response.status(constants_1.HttpNotFoundCode).json({
+                    mensagem: constants_1.notFoundContentMessage
+                });
+            if (post === constants_1.forbidenContentMessage)
+                return response.status(constants_1.HttpForbidenCode).json({
+                    mensagem: constants_1.forbidenContentMessage
+                });
             return response.status(constants_1.HttpSuccessCode).json(post);
         }
         catch (error) {
-            return response.json(error);
+            throw new errors_1.HttpError(constants_1.defaultErrorMessage, constants_1.HttpBadRequestCode);
         }
     }
     async store(request, response) {
@@ -41,7 +45,7 @@ class PostController {
                 postContent,
                 postPrivacity,
             });
-            return response.status(constants_1.HttpSuccessCode).json(post);
+            return response.status(constants_1.HttpCreatedCode).json(post);
         }
         catch (error) {
             throw new errors_1.HttpError(constants_1.defaultErrorMessage, constants_1.HttpBadRequestCode);
@@ -60,9 +64,13 @@ class PostController {
                 postPrivacity
             });
             if (post === constants_1.notFoundContentMessage)
-                throw new errors_1.HttpError(constants_1.notFoundContentMessage, constants_1.HttpNotFoundCode);
-            if (post === constants_1.forbidenMesageContent)
-                throw new errors_1.HttpError(constants_1.forbidenMesageContent, constants_1.HttpForbidenCode);
+                return response.status(constants_1.HttpNotFoundCode).json({
+                    mensagem: constants_1.notFoundContentMessage
+                });
+            if (post === constants_1.forbidenContentMessage)
+                return response.status(constants_1.HttpForbidenCode).json({
+                    mensagem: constants_1.forbidenContentMessage
+                });
             return response.status(constants_1.HttpSuccessCode).json(post);
         }
         catch (error) {
@@ -76,13 +84,16 @@ class PostController {
         try {
             const postDelete = await postService.delete(parseInt(id), Number(userId));
             if (postDelete === constants_1.notFoundContentMessage)
-                throw new errors_1.HttpError(constants_1.notFoundContentMessage, constants_1.HttpNotFoundCode);
-            if (postDelete === constants_1.forbidenMesageContent)
-                throw new errors_1.HttpError(constants_1.forbidenMesageContent, constants_1.HttpForbidenCode);
+                return response.status(constants_1.HttpNotFoundCode).json({
+                    mensagem: constants_1.notFoundContentMessage
+                });
+            if (postDelete === constants_1.forbidenContentMessage)
+                return response.status(constants_1.HttpForbidenCode).json({
+                    mensagem: constants_1.forbidenContentMessage
+                });
             return response.sendStatus(constants_1.HttpNoContentCode);
         }
         catch (error) {
-            console.log(error);
             throw new errors_1.HttpError(constants_1.defaultErrorMessage, constants_1.HttpBadRequestCode);
         }
     }

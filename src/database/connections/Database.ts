@@ -1,9 +1,7 @@
-import { Connection, createConnection} from 'typeorm';
+import { Connection, createConnection } from 'typeorm';
 
 export default class Database {
     private static instance: Connection;
-
-    private constructor() {}
 
     static async getInstance() {
         if (!Database.instance) {
@@ -18,7 +16,7 @@ export default class Database {
         try {
             return await createConnection();
         } catch (error) {
-            throw new Error(`Erro ao conectar no banco: ${error}`)
+            throw new Error(`Erro ao conectar no banco: ${error}`);
         }
     }
 }

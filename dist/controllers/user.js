@@ -30,6 +30,11 @@ class UserController {
         const { username, fullName, birthDate, gender, email, password } = request.body;
         const userService = new services_1.UserService();
         try {
+            const userAlready = await userService.checkUserAlready(email);
+            if (userAlready === constants_1.userAlreadyMessage)
+                return response.status(constants_1.HttpUnauthorizedCode).json({
+                    mensagem: constants_1.userAlreadyMessage
+                });
             const user = await userService.create({
                 username,
                 fullName,
@@ -52,17 +57,22 @@ class UserController {
     async update(request, response) {
         const { id } = request.params;
         const { userId, username, fullName, gender, birthDate } = request.body;
-        if (userId !== parseInt(id)) {
-            throw new errors_1.HttpError(constants_1.forbidenMesageContent, constants_1.HttpForbidenCode);
-        }
+        if (userId !== parseInt(id))
+            return response.status(constants_1.HttpForbidenCode).json({
+                mensagem: constants_1.forbidenContentMessage
+            });
         const userService = new services_1.UserService();
         const currentInformations = await userService.findOne(parseInt(id), userId);
         if (currentInformations === constants_1.notFoundContentMessage)
-            throw new errors_1.HttpError(constants_1.notFoundContentMessage, constants_1.HttpNotFoundCode);
+            return response.status(constants_1.HttpNotFoundCode).json({
+                mensagem: constants_1.notFoundContentMessage
+            });
         const currentEmail = currentInformations.Email;
         const currentPass = currentInformations.Senha;
         if (!currentEmail || !currentPass)
-            throw new errors_1.HttpError(constants_1.defaultErrorMessage, constants_1.HttpBadRequestCode);
+            return response.status(constants_1.HttpBadRequestCode).json({
+                mensagem: constants_1.defaultErrorMessage
+            });
         try {
             const user = await userService.update({
                 id: parseInt(id),
@@ -94,9 +104,11 @@ class UserController {
         const { email, password } = request.body;
         const userService = new services_1.UserService();
         try {
-            const userToken = await userService.verifyIfUserExists({ email, password });
+            const userToken = await userService.checkLoginData({ email, password });
             if (userToken === constants_1.unauthorizedLoginMessage)
-                throw new errors_1.HttpError(constants_1.unauthorizedLoginMessage, constants_1.HttpUnauthorizedCode);
+                return response.status(constants_1.HttpUnauthorizedCode).json({
+                    mensagem: constants_1.unauthorizedMessage
+                });
             return response.status(constants_1.HttpSuccessCode).json({
                 token: userToken
             });

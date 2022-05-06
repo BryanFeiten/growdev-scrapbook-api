@@ -27,9 +27,14 @@ class UserService {
         const repository = new repositories_1.UserRepository();
         await repository.delete(userID);
     }
-    async verifyIfUserExists(loginDTO) {
+    async checkUserAlready(email) {
         const repository = new repositories_1.UserRepository();
-        const userId = await repository.checkIfUserExists(loginDTO);
+        const userId = await repository.checkUserAlready(email);
+        return userId;
+    }
+    async checkLoginData(loginDTO) {
+        const repository = new repositories_1.UserRepository();
+        const userId = await repository.checkLoginData(loginDTO);
         return userId;
     }
 }

@@ -1,4 +1,4 @@
-import { forbidenMesageContent, notFoundContentMessage, unauthorizedLoginMessage, unauthorizedMessage } from '../constants';
+import { forbidenContentMessage, notFoundContentMessage } from '../constants';
 import { PostRepository } from '../database/repositories';
 import { PostDTO } from '../dto';
 
@@ -19,7 +19,7 @@ export class PostService {
         if (post === notFoundContentMessage) return notFoundContentMessage;
 
         if (post) {
-            return post.userId === userId || post.postPrivacity === 'public' ? post : forbidenMesageContent;
+            return post.userId === userId || post.postPrivacity === 'public' ? post : forbidenContentMessage;
         }
 
         return notFoundContentMessage;
@@ -37,7 +37,7 @@ export class PostService {
         const currentPost = await repository.findOne(postDTO.id!);
 
         if (currentPost === notFoundContentMessage) return notFoundContentMessage;
-        if (currentPost.userId !== postDTO.userId) return forbidenMesageContent;
+        if (currentPost.userId !== postDTO.userId) return forbidenContentMessage;
 
         const post = await repository.update(postDTO);
 
@@ -51,7 +51,7 @@ export class PostService {
         const currentPost = await repository.findOne(postId);
 
         if (currentPost === notFoundContentMessage) return notFoundContentMessage;
-        if (currentPost.userId !== userId) return forbidenMesageContent;
+        if (currentPost.userId !== userId) return forbidenContentMessage;
 
         return await repository.delete(postId);
     }
